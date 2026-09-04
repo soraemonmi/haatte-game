@@ -3,8 +3,7 @@
   const $ = id => document.getElementById(id);
   const S = {
     ws:null, me:null, room:null, mode:"player", hostId:null,
-    localStream:null, micOn:false, peers:new Map(), remote:new Map(),
-    timer:null, selected:null, current:null
+timer:null, selected:null, current:null
   };
 
   const themes = [
