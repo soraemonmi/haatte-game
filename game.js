@@ -109,6 +109,7 @@
 
   $("startBtn").onclick = () => send("start_game");
   $("nextRoundBtn").onclick = () => send("next_round");
+  $("restartGameBtn").onclick = () => send("restart_game");
 
   function connect(action, payload) {
     const p = location.protocol === "https:" ? "wss" : "ws";
@@ -259,6 +260,10 @@
       $("nextRoundBtn").classList.toggle(
         "hidden",
         S.me.id !== S.hostId || s.round >= s.totalRounds
+      );
+      $("restartGameBtn").classList.toggle(
+        "hidden",
+        S.me.id !== S.hostId
       );
     }
 
