@@ -31,7 +31,7 @@ const THEMES = [
   {title:"あぁ", variants:["納得","落胆","感動","疲労","閃き","不安","安心","がっかり"]},
   {title:"ヤバい", variants:["嬉しい","焦る","怖い","面白い","すごい","困った","興奮","疑う"]},
   {title:"好き", variants:["友達として","尊敬","食べ物への愛","推しへの熱","冗談","恥ずかしい","本気の告白風","やっぱり好き"]},
-  {title:"名前を呼ぶ 誰でも！", variants:["急いで呼ぶ","遠くから呼ぶ","小声で呼ぶ","怒って呼ぶ","嬉しく呼ぶ","驚いて呼ぶ","お願いするように","内緒話風"]},
+  {title:"名前を呼ぶ", variants:["急いで呼ぶ","遠くから呼ぶ","小声で呼ぶ","怒って呼ぶ","嬉しく呼ぶ","驚いて呼ぶ","お願いするように","内緒話風"]},
   {title:"自己紹介", variants:["元気に","緊張して","自信満々","小声","大げさに","眠そう","初対面で丁寧に","照れながら"]},
   {title:"笑い声", variants:["我慢して笑う","大爆笑","愛想笑い","悪だくみの笑い","照れ笑い","苦笑い","驚きの笑い","つられ笑い"]},
   {title:"ため息", variants:["疲れた","安心","呆れ","嬉しい","困った","恋愛ドラマ風","試験後","宿題を終えて"]},
@@ -235,6 +235,27 @@ function next(r) {
   startRound(r);
 }
 
+function restartGame(r, p) {
+  if (r.hostId !== p.id) {
+    return send(p, { type: "error", message: "ホストだけがリスタートできます" });
+  }
+  if (r.players.length < 2) {
+    return send(p, { type: "error", message: "プレイヤーが2人以上必要です" });
+  }
+
+  r.round = 0;
+  r.turnIndex = 0;
+  r.actorId = null;
+  r.actorName = "";
+  r.theme = null;
+  r.roles.clear();
+  r.votes.clear();
+  r.scores = new Map(r.players.map(x => [x.id, 0]));
+  r.totalRounds = r.players.length;
+
+  startRound(r);
+}
+
 function startGame(r, p) {
   if (r.hostId !== p.id) {
     return send(p, {type: "error", message: "ホストだけが開始できます"});
@@ -347,6 +368,9 @@ function handle(ws, m) {
   if (m.type === "next_round") {
     if (p.id === r.hostId && r.phase === "result") next(r);
     return;
+  }
+  if (m.type === "restart_game") {
+    return restartGame(r, p);
   }
 
   if (m.type === "vote") {
